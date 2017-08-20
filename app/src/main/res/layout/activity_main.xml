@@ -1,37 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.amap.location.demo.MainActivity">
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/location"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="15dp"
-        android:text="Location" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/locate"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="定位" />
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/location"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="15dp"
+            android:text="位置" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/location_sequence"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="15dp"
-        android:text="Location" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/locate"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="定位" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/locate_sequence"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="连续定位" />
-</LinearLayout>
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/location_sequence"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="15dp"
+            android:text="位置" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/locate_sequence"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="连续定位" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/navi_state"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="15dp"
+            android:text="状态" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/navi_init"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="初始化" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/multi_drive_path"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="15dp"
+            android:text="驾车多路线" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/calculate_multi_drive"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="计算多路线" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/single_drive_path"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="15dp"
+            android:text="驾车单路线" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/calculate_single_drive"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="计算单路线" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/walk_path"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="15dp"
+            android:text="步行路线" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/calculate_walk"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="计算步行路线" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/ride_path"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="15dp"
+            android:text="骑车路线" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/calculate_ride"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="计算骑车路线" />
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

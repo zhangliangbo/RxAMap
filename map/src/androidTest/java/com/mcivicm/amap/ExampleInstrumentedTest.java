@@ -1,4 +1,4 @@
-package com.mcivicm.map;
+package com.mcivicm.amap;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

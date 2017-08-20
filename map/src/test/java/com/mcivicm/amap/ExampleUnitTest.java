@@ -1,4 +1,4 @@
-package com.mcivicm.map;
+package com.mcivicm.amap;
 
 import org.junit.Test;
 
