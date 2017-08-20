@@ -8,6 +8,14 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.services.poisearch.PoiResult;
+import com.mcivicm.amap.location.OncePositionObservable;
+import com.mcivicm.amap.location.PositionObservable;
+import com.mcivicm.amap.navigation.MultiDriveRouteObservable;
+import com.mcivicm.amap.navigation.NaviInitObservable;
+import com.mcivicm.amap.navigation.SingleDriveRouteObservable;
+import com.mcivicm.amap.navigation.WalkRouteObservable;
+import com.mcivicm.amap.poi.KeywordPoiObservable;
 
 import io.reactivex.Observable;
 import io.reactivex.internal.functions.ObjectHelper;
@@ -123,6 +131,7 @@ public final class RxAmap {
 
     /**
      * 计算步行路径
+     *
      * @param aMapNavi
      * @param s
      * @param e
@@ -136,7 +145,8 @@ public final class RxAmap {
     }
 
     /**
-     *  计算步行路径
+     * 计算步行路径
+     *
      * @param aMapNavi
      * @param s
      * @param e
@@ -152,6 +162,7 @@ public final class RxAmap {
 
     /**
      * 计算骑行路径
+     *
      * @param aMapNavi
      * @param s
      * @param e
@@ -165,7 +176,8 @@ public final class RxAmap {
     }
 
     /**
-     *  计算骑行路径
+     * 计算骑行路径
+     *
      * @param aMapNavi
      * @param s
      * @param e
@@ -177,6 +189,35 @@ public final class RxAmap {
         NaviLatLng ns = new NaviLatLng(s.latitude, s.longitude);
         NaviLatLng ne = new NaviLatLng(e.latitude, e.longitude);
         return new WalkRouteObservable(aMapNavi, ns, ne);
+    }
+
+    /**
+     * 根据关键字查询附近的poi
+     *
+     * @param context
+     * @param keyword
+     * @return
+     */
+    public static Observable<PoiResult> keywordPoi(Context context, String keyword, int pageSize, int pageNum) {
+        Checker.requireNoEmpty(keyword, "keyword");
+        return keywordPoi(context, new String[]{keyword}, pageSize, pageNum);
+    }
+
+    /**
+     * 根据多个关键字查询poi
+     *
+     * @param context
+     * @param keywords
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
+    public static Observable<PoiResult> keywordPoi(Context context, String[] keywords, int pageSize, int pageNum) {
+        ObjectHelper.requireNonNull(context, "context==null");
+        Checker.requireLengthPositive("keywords", keywords);
+        ObjectHelper.verifyPositive(pageSize, "pageSize");
+        ObjectHelper.verifyPositive(pageNum, "pageNum");
+        return new KeywordPoiObservable(context, keywords, pageSize, pageNum);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.mcivicm.amap;
+package com.mcivicm.amap.location;
 
 import android.content.Context;
 
@@ -28,7 +28,7 @@ public class PositionObservable extends Observable<AMapLocation> {
      * @param context
      * @param interval 毫秒
      */
-    PositionObservable(Context context, long interval) {
+    public PositionObservable(Context context, long interval) {
         client = new AMapLocationClient(context);
         this.interval = interval;
         client.setLocationOption(getDefaultOption());

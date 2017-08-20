@@ -108,5 +108,26 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="计算骑车路线" />
+
+        <HorizontalScrollView
+            android:scrollbars="none"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/keyword_poi"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="15dp"
+                android:text="关键字poi" />
+
+        </HorizontalScrollView>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/search_keyword_poi"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="搜索关键字" />
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

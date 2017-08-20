@@ -1,4 +1,4 @@
-package com.mcivicm.amap;
+package com.mcivicm.amap.location;
 
 import android.content.Context;
 

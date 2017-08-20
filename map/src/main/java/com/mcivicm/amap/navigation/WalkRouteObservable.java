@@ -1,4 +1,5 @@
-package com.mcivicm.amap;
+package com.mcivicm.amap.navigation;
+
 
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
@@ -17,9 +18,6 @@ import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
 import com.autonavi.tbt.TrafficFacilityInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.MainThreadDisposable;
@@ -27,39 +25,34 @@ import io.reactivex.android.MainThreadDisposable;
 import static com.jakewharton.rxbinding2.internal.Preconditions.checkMainThread;
 
 /**
- * 单个驾驶路线
+ * 步行路线
  */
 
-public class SingleDriveRouteObservable extends Observable<AMapNaviPath> {
-
+public class WalkRouteObservable extends Observable<AMapNaviPath> {
     private AMapNavi aMapNavi;
     private NaviLatLng s;
     private NaviLatLng e;
-    private int strategy;
 
-    public SingleDriveRouteObservable(AMapNavi navi, NaviLatLng ns, NaviLatLng ne, int strategy) {
+    public WalkRouteObservable(AMapNavi navi, NaviLatLng s, NaviLatLng e) {
         this.aMapNavi = navi;
-        this.s = ns;
-        this.e = ne;
-        this.strategy = strategy;
+        this.s = s;
+        this.e = e;
     }
 
     @Override
     protected void subscribeActual(Observer<? super AMapNaviPath> observer) {
-        if (!checkMainThread(observer)) {
-            return;
-        }
+        if (!checkMainThread(observer)) return;
         Source source = new Source(aMapNavi, observer);
         aMapNavi.addAMapNaviListener(source);
         observer.onSubscribe(source);
-        aMapNavi.calculateDriveRoute(Arrays.asList(s), Arrays.asList(e), new ArrayList<NaviLatLng>(0), strategy);
+        aMapNavi.calculateWalkRoute(s, e);
     }
 
     private static final class Source extends MainThreadDisposable implements AMapNaviListener {
         private final AMapNavi navi;
         private final Observer<? super AMapNaviPath> observer;
 
-        public Source(AMapNavi navi, Observer<? super AMapNaviPath> observer) {
+        Source(AMapNavi navi, Observer<? super AMapNaviPath> observer) {
             this.navi = navi;
             this.observer = observer;
         }
@@ -113,7 +106,7 @@ public class SingleDriveRouteObservable extends Observable<AMapNaviPath> {
         public void onCalculateRouteFailure(int i) {
             if (!isDisposed()) {
                 observer.onError(new Exception("路线计算失败" + ", 错误码：" + i + ", 详情参见" + PathPlanningErrCode.class.getName()));
-                this.navi.removeAMapNaviListener(this);//取得数据之后立即解除该监听
+                navi.removeAMapNaviListener(this);//取得数据之后立即解除该监听
             }
         }
 

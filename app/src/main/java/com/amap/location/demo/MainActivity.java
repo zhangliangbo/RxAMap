@@ -13,6 +13,8 @@ import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.enums.PathPlanningStrategy;
 import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.services.core.PoiItem;
+import com.amap.api.services.poisearch.PoiResult;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.mcivicm.amap.RxAmap;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -34,10 +36,12 @@ import io.reactivex.observers.DisposableObserver;
 
 
 public class MainActivity extends AppCompatActivity {
-    @BindViews({R.id.location, R.id.location_sequence, R.id.navi_state, R.id.multi_drive_path, R.id.single_drive_path, R.id.walk_path, R.id.ride_path})
+    @BindViews({R.id.location, R.id.location_sequence, R.id.navi_state, R.id.multi_drive_path,
+            R.id.single_drive_path, R.id.walk_path, R.id.ride_path, R.id.keyword_poi})
     AppCompatTextView[] mLocation;
 
-    @BindViews({R.id.locate, R.id.locate_sequence, R.id.navi_init, R.id.calculate_multi_drive, R.id.calculate_single_drive, R.id.calculate_walk, R.id.calculate_ride})
+    @BindViews({R.id.locate, R.id.locate_sequence, R.id.navi_init, R.id.calculate_multi_drive,
+            R.id.calculate_single_drive, R.id.calculate_walk, R.id.calculate_ride, R.id.search_keyword_poi})
     AppCompatButton[] mLocate;
 
     SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS", Locale.CHINA);
@@ -177,6 +181,30 @@ public class MainActivity extends AppCompatActivity {
                                                 mLocation[integer].setText(format.format(new Date()) + "\n" + "总长：" + aMapNaviPath.getAllLength());
                                             }
                                         });
+                            } else if (integer == 7) {
+                                RxAmap.keywordPoi(MainActivity.this, new String[]{"餐厅","学校"}, 10, 1).subscribe(new Consumer<PoiResult>() {
+                                    @Override
+                                    public void accept(PoiResult poiResult) throws Exception {
+                                        StringBuilder stringBuilder = new StringBuilder();
+                                        stringBuilder.append(format.format(new Date())).append("\n");
+                                        if (poiResult.getSearchSuggestionKeywords() != null && poiResult.getSearchSuggestionKeywords().size() > 0) {
+                                            stringBuilder.append("关键词：").append("\n");
+                                            for (String kw : poiResult.getSearchSuggestionKeywords()) {
+                                                stringBuilder.append(kw).append(", ");
+                                            }
+                                            stringBuilder.append("\n");
+                                        }
+
+                                        if (poiResult.getPois() != null && poiResult.getPois().size() > 0) {
+                                            stringBuilder.append("Poi: ").append("\n");
+                                            for (PoiItem pt : poiResult.getPois()) {
+                                                stringBuilder.append(pt.getTitle()).append(", ");
+                                            }
+                                            stringBuilder.append("\n");
+                                        }
+                                        mLocation[integer].setText(stringBuilder.toString());
+                                    }
+                                });
                             }
 
                         }

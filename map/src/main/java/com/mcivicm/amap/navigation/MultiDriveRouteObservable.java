@@ -1,96 +1,80 @@
-package com.mcivicm.amap;
+package com.mcivicm.amap.navigation;
 
-import android.content.Context;
+import android.util.SparseArray;
 
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
+import com.amap.api.navi.enums.PathPlanningErrCode;
 import com.amap.api.navi.model.AMapLaneInfo;
 import com.amap.api.navi.model.AMapNaviCameraInfo;
 import com.amap.api.navi.model.AMapNaviCross;
 import com.amap.api.navi.model.AMapNaviInfo;
 import com.amap.api.navi.model.AMapNaviLocation;
+import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.AMapNaviTrafficFacilityInfo;
 import com.amap.api.navi.model.AMapServiceAreaInfo;
 import com.amap.api.navi.model.AimLessModeCongestionInfo;
 import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
+import com.amap.api.navi.model.NaviLatLng;
 import com.autonavi.tbt.TrafficFacilityInfo;
 
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.MainThreadDisposable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 
 import static com.jakewharton.rxbinding2.internal.Preconditions.checkMainThread;
 
 /**
- * 导航是否准备好
+ * 驾驶线路
  */
 
-public class NaviInitObservable extends Observable<AMapNavi> {
-    private Context context;
+public class MultiDriveRouteObservable extends Observable<SparseArray<AMapNaviPath>> {
+    private AMapNavi navi;
+    private NaviLatLng sll = null;
+    private NaviLatLng ell = null;
+    private int strategy;
 
-    public NaviInitObservable(Context context) {
-        this.context = context;
+    public MultiDriveRouteObservable(AMapNavi navi, NaviLatLng start, NaviLatLng end, int strategy) {
+        this.navi = navi;
+        sll = start;
+        ell = end;
+        this.strategy = strategy;
     }
 
-
     @Override
-    protected void subscribeActual(Observer<? super AMapNavi> observer) {
+    protected void subscribeActual(Observer<? super SparseArray<AMapNaviPath>> observer) {
         if (!checkMainThread(observer)) {
             return;
         }
-
-        AMapNavi navi = AMapNavi.getInstance(context);
         Source source = new Source(navi, observer);
         navi.addAMapNaviListener(source);
-        observer.onSubscribe(source);
+        observer.onSubscribe(source);//可以dispose解除监听
+        navi.calculateDriveRoute(Arrays.asList(sll), Arrays.asList(ell), new ArrayList<NaviLatLng>(0), strategy);
     }
 
-    private static class Source extends MainThreadDisposable implements AMapNaviListener {
 
-        private final AMapNavi navi;
-        private final Observer<? super AMapNavi> observer;
-        private Disposable fixedNotifaction;
+    private static final class Source extends MainThreadDisposable implements AMapNaviListener {
 
-        Source(AMapNavi navi, Observer<? super AMapNavi> observer) {
-            this.navi = navi;
+        private final AMapNavi mapNavi;
+        private final Observer<? super SparseArray<AMapNaviPath>> observer;
+
+        Source(AMapNavi navi, Observer<? super SparseArray<AMapNaviPath>> observer) {
+            this.mapNavi = navi;
             this.observer = observer;
-            /**
-             * 如果AMapNavi已经初始化成功，
-             * 无论添加多少个监听器，{@link AMapNaviListener#onInitNaviFailure()}和{@link AMapNaviListener#onInitNaviSuccess()}都不会有回调数据，
-             * 所以过1s秒后直接通知准备好。
-             */
-            fixedNotifaction = Completable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action() {
-                @Override
-                public void run() throws Exception {
-                    Source.this.observer.onNext(Source.this.navi);
-                    Source.this.navi.removeAMapNaviListener(Source.this);
-                }
-            });
         }
 
         @Override
         public void onInitNaviFailure() {
-            fixedNotifaction.dispose();//如果有数据过来，取消掉默认的通知
-            if (!isDisposed()) {
-                observer.onError(new Exception("导航初始化失败"));
-                this.navi.removeAMapNaviListener(this);
-            }
+
         }
 
         @Override
         public void onInitNaviSuccess() {
-            fixedNotifaction.dispose();//如果有数据过来，取消掉默认的通知
-            if (!isDisposed()) {
-                observer.onNext(navi);
-                this.navi.removeAMapNaviListener(this);
-            }
+
         }
 
         @Override
@@ -130,7 +114,12 @@ public class NaviInitObservable extends Observable<AMapNavi> {
 
         @Override
         public void onCalculateRouteFailure(int i) {
-
+            if (!isDisposed()) {
+                observer.onError(new Exception("路线计算失败" + ", 错误码：" + i + ", 详情参见" + PathPlanningErrCode.class.getName()));
+                if (mapNavi != null) {
+                    mapNavi.removeAMapNaviListener(this);//取得数据之后立即解除该监听
+                }
+            }
         }
 
         @Override
@@ -195,7 +184,21 @@ public class NaviInitObservable extends Observable<AMapNavi> {
 
         @Override
         public void onCalculateRouteSuccess(int[] ints) {
-
+            if (!isDisposed()) {
+                SparseArray<AMapNaviPath> sparseArray = new SparseArray<>();
+                if (ints != null && ints.length > 0 && mapNavi != null) {
+                    for (int i : ints) {
+                        AMapNaviPath path = mapNavi.getNaviPaths().get(i);
+                        if (path != null) {
+                            sparseArray.put(i, path);
+                        }
+                    }
+                }
+                observer.onNext(sparseArray);
+                if (mapNavi != null) {
+                    mapNavi.removeAMapNaviListener(this);//取得数据之后立即解除该监听
+                }
+            }
         }
 
         @Override
@@ -235,8 +238,9 @@ public class NaviInitObservable extends Observable<AMapNavi> {
 
         @Override
         protected void onDispose() {
-            fixedNotifaction.dispose();
-            navi.removeAMapNaviListener(this);
+            if (mapNavi != null) {
+                mapNavi.removeAMapNaviListener(this);
+            }
         }
     }
 }

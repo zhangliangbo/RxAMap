@@ -1,6 +1,4 @@
-package com.mcivicm.amap;
-
-import android.util.SparseArray;
+package com.mcivicm.amap.navigation;
 
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
@@ -19,9 +17,6 @@ import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
 import com.autonavi.tbt.TrafficFacilityInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.MainThreadDisposable;
@@ -29,41 +24,35 @@ import io.reactivex.android.MainThreadDisposable;
 import static com.jakewharton.rxbinding2.internal.Preconditions.checkMainThread;
 
 /**
- * 驾驶线路
+ * 汽车线路
  */
 
-public class MultiDriveRouteObservable extends Observable<SparseArray<AMapNaviPath>> {
-    private AMapNavi navi;
-    private NaviLatLng sll = null;
-    private NaviLatLng ell = null;
-    private int strategy;
+public class RideRouteObservable extends Observable<AMapNaviPath> {
+    private AMapNavi aMapNavi;
+    private NaviLatLng s;
+    private NaviLatLng e;
 
-    public MultiDriveRouteObservable(AMapNavi navi, NaviLatLng start, NaviLatLng end, int strategy) {
-        this.navi = navi;
-        sll = start;
-        ell = end;
-        this.strategy = strategy;
+    public RideRouteObservable(AMapNavi navi, NaviLatLng s, NaviLatLng e) {
+        this.aMapNavi = navi;
+        this.s = s;
+        this.e = e;
     }
 
     @Override
-    protected void subscribeActual(Observer<? super SparseArray<AMapNaviPath>> observer) {
-        if (!checkMainThread(observer)) {
-            return;
-        }
-        Source source = new Source(navi, observer);
-        navi.addAMapNaviListener(source);
-        observer.onSubscribe(source);//可以dispose解除监听
-        navi.calculateDriveRoute(Arrays.asList(sll), Arrays.asList(ell), new ArrayList<NaviLatLng>(0), strategy);
+    protected void subscribeActual(Observer<? super AMapNaviPath> observer) {
+        if (!checkMainThread(observer)) return;
+        Source source = new Source(aMapNavi, observer);
+        aMapNavi.addAMapNaviListener(source);
+        observer.onSubscribe(source);
+        aMapNavi.calculateRideRoute(s, e);//计算骑行的方法
     }
 
-
     private static final class Source extends MainThreadDisposable implements AMapNaviListener {
+        private final AMapNavi navi;
+        private final Observer<? super AMapNaviPath> observer;
 
-        private final AMapNavi mapNavi;
-        private final Observer<? super SparseArray<AMapNaviPath>> observer;
-
-        Source(AMapNavi navi, Observer<? super SparseArray<AMapNaviPath>> observer) {
-            this.mapNavi = navi;
+        Source(AMapNavi navi, Observer<? super AMapNaviPath> observer) {
+            this.navi = navi;
             this.observer = observer;
         }
 
@@ -116,9 +105,7 @@ public class MultiDriveRouteObservable extends Observable<SparseArray<AMapNaviPa
         public void onCalculateRouteFailure(int i) {
             if (!isDisposed()) {
                 observer.onError(new Exception("路线计算失败" + ", 错误码：" + i + ", 详情参见" + PathPlanningErrCode.class.getName()));
-                if (mapNavi != null) {
-                    mapNavi.removeAMapNaviListener(this);//取得数据之后立即解除该监听
-                }
+                navi.removeAMapNaviListener(this);//取得数据之后立即解除该监听
             }
         }
 
@@ -185,18 +172,10 @@ public class MultiDriveRouteObservable extends Observable<SparseArray<AMapNaviPa
         @Override
         public void onCalculateRouteSuccess(int[] ints) {
             if (!isDisposed()) {
-                SparseArray<AMapNaviPath> sparseArray = new SparseArray<>();
-                if (ints != null && ints.length > 0 && mapNavi != null) {
-                    for (int i : ints) {
-                        AMapNaviPath path = mapNavi.getNaviPaths().get(i);
-                        if (path != null) {
-                            sparseArray.put(i, path);
-                        }
-                    }
-                }
-                observer.onNext(sparseArray);
-                if (mapNavi != null) {
-                    mapNavi.removeAMapNaviListener(this);//取得数据之后立即解除该监听
+                AMapNaviPath path = navi.getNaviPath();
+                if (path != null) {
+                    observer.onNext(path);
+                    navi.removeAMapNaviListener(this);
                 }
             }
         }
@@ -238,9 +217,7 @@ public class MultiDriveRouteObservable extends Observable<SparseArray<AMapNaviPa
 
         @Override
         protected void onDispose() {
-            if (mapNavi != null) {
-                mapNavi.removeAMapNaviListener(this);
-            }
+            navi.removeAMapNaviListener(this);
         }
     }
 }
