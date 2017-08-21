@@ -1,5 +1,7 @@
 package com.mcivicm.amap;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.util.SparseArray;
 
@@ -8,6 +10,7 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.poisearch.PoiResult;
 import com.mcivicm.amap.location.OncePositionObservable;
 import com.mcivicm.amap.location.PositionObservable;
@@ -15,7 +18,9 @@ import com.mcivicm.amap.navigation.MultiDriveRouteObservable;
 import com.mcivicm.amap.navigation.NaviInitObservable;
 import com.mcivicm.amap.navigation.SingleDriveRouteObservable;
 import com.mcivicm.amap.navigation.WalkRouteObservable;
+import com.mcivicm.amap.poi.CirclePoiObservable;
 import com.mcivicm.amap.poi.KeywordPoiObservable;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import io.reactivex.Observable;
 import io.reactivex.internal.functions.ObjectHelper;
@@ -25,6 +30,12 @@ import io.reactivex.internal.functions.ObjectHelper;
  */
 
 public final class RxAmap {
+
+    public static Observable<Boolean> permission(Activity activity) {
+        ObjectHelper.requireNonNull(activity, "activity==null");
+        return new RxPermissions(activity).request(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
     /**
      * 定位一次
      *
@@ -218,6 +229,44 @@ public final class RxAmap {
         ObjectHelper.verifyPositive(pageSize, "pageSize");
         ObjectHelper.verifyPositive(pageNum, "pageNum");
         return new KeywordPoiObservable(context, keywords, pageSize, pageNum);
+    }
+
+    /**
+     * 搜索圆形范围的POI
+     *
+     * @param context
+     * @param keywords
+     * @param pageSize
+     * @param pageNum
+     * @param center
+     * @param radius
+     * @return
+     */
+    public static Observable<PoiResult> circlePoi(Context context, String[] keywords, int pageSize, int pageNum, LatLonPoint center, int radius) {
+        ObjectHelper.requireNonNull(context, "context==null");
+        Checker.requireLengthPositive("keywords", keywords);
+        ObjectHelper.verifyPositive(pageSize, "pageSize");
+        ObjectHelper.verifyPositive(pageNum, "pageNum");
+        ObjectHelper.requireNonNull(center, "center==null");
+        ObjectHelper.verifyPositive(radius, "radius");
+        return new CirclePoiObservable(context, keywords, pageSize, pageNum, center, radius);
+    }
+
+    /**
+     * 搜索圆形范围的POI
+     *
+     * @param context
+     * @param keywords
+     * @param pageSize
+     * @param pageNum
+     * @param center
+     * @param radius
+     * @return
+     */
+    public static Observable<PoiResult> circlePoi(Context context, String[] keywords, int pageSize, int pageNum, LatLng center, int radius) {
+        ObjectHelper.requireNonNull(center, "center==null");
+        LatLonPoint llp = new LatLonPoint(center.latitude, center.longitude);
+        return new CirclePoiObservable(context, keywords, pageSize, pageNum, llp, radius);
     }
 
 }

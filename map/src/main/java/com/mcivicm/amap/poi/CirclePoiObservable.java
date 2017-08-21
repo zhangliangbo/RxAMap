@@ -45,7 +45,7 @@ public class CirclePoiObservable extends KeywordPoiObservable {
         query.setPageNum(getPageNum());
         //新建查询
         poiSearch = new PoiSearch(getContext(), query);
-        poiSearch.setBound(new PoiSearch.SearchBound(this.center, this.radius));//关键的一步
+        poiSearch.setBound(new PoiSearch.SearchBound(this.center, this.radius));//关键的一步，设置中心点和半径
         PoiObservable.Source source = new PoiObservable.Source(poiSearch, observer);
         poiSearch.setOnPoiSearchListener(source);
         observer.onSubscribe(source);

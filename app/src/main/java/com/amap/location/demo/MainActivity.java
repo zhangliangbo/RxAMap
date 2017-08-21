@@ -37,12 +37,13 @@ import io.reactivex.observers.DisposableObserver;
 
 public class MainActivity extends AppCompatActivity {
     @BindViews({R.id.location, R.id.location_sequence, R.id.navi_state, R.id.multi_drive_path,
-            R.id.single_drive_path, R.id.walk_path, R.id.ride_path, R.id.keyword_poi})
+            R.id.single_drive_path, R.id.walk_path, R.id.ride_path})
     AppCompatTextView[] mLocation;
 
     @BindViews({R.id.locate, R.id.locate_sequence, R.id.navi_init, R.id.calculate_multi_drive,
-            R.id.calculate_single_drive, R.id.calculate_walk, R.id.calculate_ride, R.id.search_keyword_poi})
+            R.id.calculate_single_drive, R.id.calculate_walk, R.id.calculate_ride})
     AppCompatButton[] mLocate;
+
 
     SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS", Locale.CHINA);
 
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                                             }
                                         });
                             } else if (integer == 7) {
-                                RxAmap.keywordPoi(MainActivity.this, new String[]{"餐厅","学校"}, 10, 1).subscribe(new Consumer<PoiResult>() {
+                                RxAmap.keywordPoi(MainActivity.this, new String[]{"餐厅", "学校"}, 10, 1).subscribe(new Consumer<PoiResult>() {
                                     @Override
                                     public void accept(PoiResult poiResult) throws Exception {
                                         StringBuilder stringBuilder = new StringBuilder();

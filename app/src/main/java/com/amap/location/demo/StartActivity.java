@@ -72,7 +72,8 @@ public class StartActivity extends ListActivity {
                     Alarm_Location_Activity.class),
             new DemoDetails(R.string.errorCode, R.string.errorCode_dec,
                     ErrorCode_Activity.class),
-            new DemoDetails(R.string.rx_map, R.string.rx_map_dec, MainActivity.class)
+            new DemoDetails(R.string.rx_map, R.string.rx_map_dec, MainActivity.class),
+            new DemoDetails(R.string.poi, R.string.string_poi_error, POIActivity.class)
     };
 
 
