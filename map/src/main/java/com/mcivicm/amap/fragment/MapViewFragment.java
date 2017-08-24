@@ -1,4 +1,4 @@
-package com.mcivicm.amap;
+package com.mcivicm.amap.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

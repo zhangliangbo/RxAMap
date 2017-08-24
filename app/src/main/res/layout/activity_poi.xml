@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/map_view"
-        android:name="com.mcivicm.amap.MapViewFragment"
+        android:name="com.mcivicm.amap.fragment.MapViewFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"

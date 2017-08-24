@@ -127,7 +127,8 @@
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
-        <activity android:name=".POIActivity"></activity>
+        <activity android:name=".POIActivity" />
+        <activity android:name=".TrailActivity"></activity>
     </application>
 
 </manifest>

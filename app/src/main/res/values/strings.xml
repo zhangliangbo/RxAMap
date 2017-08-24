@@ -140,4 +140,6 @@
     <string name="rx_map_dec">Rx的使用</string>
     <string name="poi">POI</string>
     <string name="string_poi_error">POI的使用</string>
+    <string name="trail">轨迹播放</string>
+    <string name="trail_error">高德地图进行轨迹播放</string>
 </resources>

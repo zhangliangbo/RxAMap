@@ -13,7 +13,7 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.poisearch.PoiResult;
-import com.mcivicm.amap.MapViewFragment;
+import com.mcivicm.amap.fragment.MapViewFragment;
 import com.mcivicm.amap.RxAmap;
 
 import butterknife.ButterKnife;
