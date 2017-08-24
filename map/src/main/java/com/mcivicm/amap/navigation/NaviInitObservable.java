@@ -90,6 +90,7 @@ public class NaviInitObservable extends Observable<AMapNavi> {
             if (!isDisposed()) {
                 observer.onNext(navi);
                 this.navi.removeAMapNaviListener(this);
+                observer.onComplete();
             }
         }
 

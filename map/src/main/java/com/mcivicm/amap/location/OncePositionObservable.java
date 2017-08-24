@@ -73,6 +73,7 @@ public class OncePositionObservable extends Observable<AMapLocation> {
             if (!isDisposed()) {
                 observer.onNext(aMapLocation);
                 client.stopLocation();//定位一次之后马上停止定位
+                observer.onComplete();
             }
         }
 

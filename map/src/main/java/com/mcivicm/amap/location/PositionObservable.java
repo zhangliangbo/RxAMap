@@ -84,6 +84,7 @@ public class PositionObservable extends Observable<AMapLocation> {
         public void onLocationChanged(AMapLocation aMapLocation) {
             if (!isDisposed()) {
                 observer.onNext(aMapLocation);//这里不主动停止定位，因为要持续请求
+                observer.onComplete();
             }
         }
 

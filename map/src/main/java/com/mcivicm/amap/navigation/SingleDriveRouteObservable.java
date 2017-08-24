@@ -184,6 +184,7 @@ public class SingleDriveRouteObservable extends Observable<AMapNaviPath> {
                 if (path != null) {
                     observer.onNext(path);
                     navi.removeAMapNaviListener(this);
+                    observer.onComplete();
                 }
             }
         }

@@ -29,6 +29,7 @@ abstract class PoiObservable<T> extends Observable<T> {
             if (!isDisposed()) {
                 if (i == 1000) {//1000表示成功
                     observer.onNext(poiResult);
+                    observer.onComplete();//完成查询
                 } else {
                     observer.onError(new Exception("根据关键字搜索POI错误，错误码:" + i));
                 }

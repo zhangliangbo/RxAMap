@@ -198,6 +198,7 @@ public class MultiDriveRouteObservable extends Observable<SparseArray<AMapNaviPa
                 if (mapNavi != null) {
                     mapNavi.removeAMapNaviListener(this);//取得数据之后立即解除该监听
                 }
+                observer.onComplete();
             }
         }
 
