@@ -11,6 +11,8 @@ import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.core.PoiItem;
+import com.amap.api.services.help.Tip;
 import com.amap.api.services.poisearch.PoiResult;
 import com.mcivicm.amap.location.OncePositionObservable;
 import com.mcivicm.amap.location.PositionObservable;
@@ -19,8 +21,13 @@ import com.mcivicm.amap.navigation.NaviInitObservable;
 import com.mcivicm.amap.navigation.SingleDriveRouteObservable;
 import com.mcivicm.amap.navigation.WalkRouteObservable;
 import com.mcivicm.amap.poi.CirclePoiObservable;
+import com.mcivicm.amap.poi.IdPoiObservable;
+import com.mcivicm.amap.poi.InputtipsObservable;
 import com.mcivicm.amap.poi.KeywordPoiObservable;
+import com.mcivicm.amap.poi.PolygonPoiObservable;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.internal.functions.ObjectHelper;
@@ -267,6 +274,97 @@ public final class RxAmap {
         ObjectHelper.requireNonNull(center, "center==null");
         LatLonPoint llp = new LatLonPoint(center.latitude, center.longitude);
         return new CirclePoiObservable(context, keywords, pageSize, pageNum, llp, radius);
+    }
+
+    /**
+     * 单个关键字的圆形范围
+     *
+     * @param context
+     * @param keyword
+     * @param pageSize
+     * @param pageNum
+     * @param center
+     * @param radius
+     * @return
+     */
+    public static Observable<PoiResult> circlePoi(Context context, String keyword, int pageSize, int pageNum, LatLng center, int radius) {
+        ObjectHelper.requireNonNull(keyword, "keyword==null");
+        return circlePoi(context, new String[]{keyword}, pageSize, pageNum, center, radius);
+    }
+
+    /**
+     * 单个关键字的圆形范围
+     *
+     * @param context
+     * @param keyword
+     * @param pageSize
+     * @param pageNum
+     * @param center
+     * @param radius
+     * @return
+     */
+    public static Observable<PoiResult> circlePoi(Context context, String keyword, int pageSize, int pageNum, LatLonPoint center, int radius) {
+        ObjectHelper.requireNonNull(keyword, "keyword==null");
+        return circlePoi(context, new String[]{keyword}, pageSize, pageNum, center, radius);
+    }
+
+    /**
+     * 多边形范围的POI
+     *
+     * @param context
+     * @param keywords
+     * @param pageSize
+     * @param pageNum
+     * @param list
+     * @return
+     */
+    public static Observable<PoiResult> polygonPoi(Context context, String[] keywords, int pageSize, int pageNum, List<LatLonPoint> list) {
+        ObjectHelper.requireNonNull(context, "context==null");
+        Checker.requireLengthPositive("keywords", keywords);
+        ObjectHelper.verifyPositive(pageSize, "pageSize");
+        ObjectHelper.verifyPositive(pageNum, "pageNum");
+        ObjectHelper.requireNonNull(list, "list==null");
+        return new PolygonPoiObservable(context, keywords, pageSize, pageNum, list);
+    }
+
+    /**
+     * 单个关键字的多边形范围
+     *
+     * @param context
+     * @param keyword
+     * @param pageSize
+     * @param pageNum
+     * @param list
+     * @return
+     */
+    public static Observable<PoiResult> polygonPoi(Context context, String keyword, int pageSize, int pageNum, List<LatLonPoint> list) {
+        ObjectHelper.requireNonNull(keyword, "keyword==null");
+        return polygonPoi(context, new String[]{keyword}, pageSize, pageNum, list);
+    }
+
+    /**
+     * 根据ID查询POI
+     *
+     * @param context
+     * @param id
+     * @return
+     */
+    public static Observable<PoiItem> idPoi(Context context, String id) {
+        ObjectHelper.requireNonNull(context, "context==null");
+        ObjectHelper.requireNonNull(id, "id==null");
+        return new IdPoiObservable(context, id);
+    }
+
+    /**
+     *
+     * @param context
+     * @param query
+     * @return
+     */
+    public static Observable<List<Tip>> poiTips(Context context, String query) {
+        ObjectHelper.requireNonNull(context, "context==null");
+        ObjectHelper.requireNonNull(query, "query==null");
+        return new InputtipsObservable(context, query);
     }
 
 }

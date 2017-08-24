@@ -6,25 +6,24 @@ import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
 
+import java.util.List;
+
 import io.reactivex.Observer;
 
 import static com.jakewharton.rxbinding2.internal.Preconditions.checkMainThread;
 
 /**
- * 周边POI
+ * 多边形搜索范围
  */
 
-public class CirclePoiObservable extends KeywordPoiObservable {
-    private PoiSearch poiSearch;
-    private LatLonPoint center;
-    private int radius;
+public class PolygonPoiObservable extends KeywordPoiObservable {
 
-    public CirclePoiObservable(Context context, String[] keywords, int pageSize, int pageNum, LatLonPoint center, int radius) {
+    private List<LatLonPoint> list;
+
+    public PolygonPoiObservable(Context context, String[] keywords, int pageSize, int pageNum, List<LatLonPoint> list) {
         super(context, keywords, pageSize, pageNum);
-        this.center = center;
-        this.radius = radius;
+        this.list = list;
     }
-
 
     @Override
     protected void subscribeActual(Observer<? super PoiResult> observer) {
@@ -44,12 +43,12 @@ public class CirclePoiObservable extends KeywordPoiObservable {
         query.setPageSize(getPageSize());
         query.setPageNum(getPageNum());
         //新建查询
-        poiSearch = new PoiSearch(getContext(), query);
-        poiSearch.setBound(new PoiSearch.SearchBound(this.center, this.radius));//关键的一步，设置中心点和半径
-        PoiObservable.Source source = new PoiObservable.Source(poiSearch, observer);
-        poiSearch.setOnPoiSearchListener(source);
-        observer.onSubscribe(source);
-        //开始异步查询
-        poiSearch.searchPOIAsyn();
+        PoiSearch poiSearch = new PoiSearch(getContext(), query);
+        poiSearch.setBound(new PoiSearch.SearchBound(list));//关键的一步，设置中心点和半径
+        //新建数据源
+        Source source = new Source(poiSearch, observer);
+        poiSearch.setOnPoiSearchListener(source);//设置查询监听
+        observer.onSubscribe(source);//告知观察者开始数据发送
+        poiSearch.searchPOIAsyn();//异步查询
     }
 }
